@@ -84,8 +84,18 @@ namespace OpenAI.Realtime
             var transcription = TakeField("input_audio_transcription");
             if (transcription != null) audioInput["transcription"] = transcription;
 
+            // GA API only supports ["text"] or ["audio"] separately, not combined.
+            // Default to ["audio"] for realtime voice sessions.
             var modalities = TakeField("modalities");
-            if (modalities != null) configJson["output_modalities"] = modalities;
+            if (modalities is JArray arr && arr.Count > 1)
+            {
+                // If both text and audio requested, prefer audio for realtime
+                configJson["output_modalities"] = new JArray("audio");
+            }
+            else if (modalities != null)
+            {
+                configJson["output_modalities"] = modalities;
+            }
 
             // Build audio object
             var audio = new JObject();
