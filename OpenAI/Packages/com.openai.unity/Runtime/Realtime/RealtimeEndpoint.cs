@@ -116,17 +116,14 @@ namespace OpenAI.Realtime
             var createSessionResponse = await Rest.PostAsync(GetUrl("/client_secrets"), payload, new RestParameters(client.DefaultRequestHeaders), cancellationToken);
             createSessionResponse.Validate(EnableDebug);
 
-            // Parse response and log for debugging
+            // GA response has { "value": "...", "expires_at": ..., "session": {...} } at root level
             var responseJson = JObject.Parse(createSessionResponse.Body);
-            Debug.Log($"[RealtimeEndpoint] client_secrets response keys: {string.Join(", ", responseJson.Properties().Select(p => p.Name))}");
-            var clientSecretToken = responseJson["client_secret"];
+            var clientSecret = responseJson.ToObject<ClientSecret>(JsonSerializer.Create(OpenAIClient.JsonSerializationOptions));
 
-            if (clientSecretToken == null)
+            if (clientSecret == null || string.IsNullOrWhiteSpace(clientSecret.EphemeralApiKey))
             {
-                throw new InvalidOperationException("Failed to create a client secret. Response did not contain 'client_secret'.");
+                throw new InvalidOperationException("Failed to create a client secret. Response did not contain ephemeral API key.");
             }
-
-            var clientSecret = clientSecretToken.ToObject<ClientSecret>(JsonSerializer.Create(OpenAIClient.JsonSerializationOptions));
             var createSession = configuration;
             createSession.ClientSecret = clientSecret;
 
