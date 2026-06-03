@@ -107,7 +107,7 @@ namespace OpenAI.Realtime
         {
             ClientSecret = new ClientSecret(expiresAfter);
             Model = string.IsNullOrWhiteSpace(model?.Id) && prompt == null
-                ? Models.Model.GPT4oRealtime
+                ? Models.Model.GPT_Realtime
                 : model;
             Modalities = modalities;
             Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;

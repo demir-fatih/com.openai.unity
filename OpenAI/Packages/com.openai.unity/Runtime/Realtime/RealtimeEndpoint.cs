@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenAI.Extensions;
 using OpenAI.Models;
 using System;
@@ -41,13 +42,36 @@ namespace OpenAI.Realtime
                 queryParameters["model"] = model;
             }
 
-            var payload = JsonConvert.SerializeObject(configuration, OpenAIClient.JsonSerializationOptions);
+            // Build GA API request: { "expires_after": {...}, "session": { ...config without client_secret... } }
+            var configJson = JObject.Parse(JsonConvert.SerializeObject(configuration, OpenAIClient.JsonSerializationOptions));
+            var expiresAfter = configJson.Remove("client_secret") != null
+                ? configuration.ClientSecret?.ExpiresAfter ?? new ExpiresAfter(600)
+                : new ExpiresAfter(600);
+
+            var requestBody = new JObject
+            {
+                ["expires_after"] = JObject.FromObject(expiresAfter, JsonSerializer.Create(OpenAIClient.JsonSerializationOptions)),
+                ["session"] = configJson
+            };
+
+            var payload = requestBody.ToString(Formatting.None);
             var createSessionResponse = await Rest.PostAsync(GetUrl("/client_secrets"), payload, new RestParameters(client.DefaultRequestHeaders), cancellationToken);
             createSessionResponse.Validate(EnableDebug);
-            var createSession = createSessionResponse.Deserialize<SessionConfiguration>(client);
 
-            if (createSession == null ||
-                string.IsNullOrWhiteSpace(createSession.ClientSecret?.EphemeralApiKey))
+            // Response: { "client_secret": { "value": "...", "expires_at": ... }, "session": {...} }
+            var responseJson = JObject.Parse(createSessionResponse.Body);
+            var clientSecretToken = responseJson["client_secret"];
+
+            if (clientSecretToken == null)
+            {
+                throw new InvalidOperationException("Failed to create a client secret. Response did not contain 'client_secret'.");
+            }
+
+            var clientSecret = clientSecretToken.ToObject<ClientSecret>(JsonSerializer.Create(OpenAIClient.JsonSerializationOptions));
+            var createSession = configuration;
+            createSession.ClientSecret = clientSecret;
+
+            if (string.IsNullOrWhiteSpace(createSession.ClientSecret?.EphemeralApiKey))
             {
                 throw new InvalidOperationException("Failed to create a session. Ensure the configuration is valid and the API key is set.");
             }
