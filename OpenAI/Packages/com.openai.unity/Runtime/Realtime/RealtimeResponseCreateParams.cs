@@ -156,7 +156,7 @@ namespace OpenAI.Realtime
         /// The set of modalities the model can respond with. To disable audio, set this to ["text"].
         /// </summary>
         [Preserve]
-        [JsonProperty("modalities")]
+        [JsonProperty("output_modalities")]
         [JsonConverter(typeof(ModalityConverter))]
         public Modality Modalities { get; private set; }
 
@@ -190,7 +190,7 @@ namespace OpenAI.Realtime
         /// The format of output audio. Options are `pcm16`, `g711_ulaw`, or `g711_alaw`.
         /// </summary>
         [Preserve]
-        [JsonProperty("output_audio_format")]
+        [JsonProperty("output_audio_format", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public RealtimeAudioFormat OutputAudioFormat { get; private set; }
 
         /// <summary>
