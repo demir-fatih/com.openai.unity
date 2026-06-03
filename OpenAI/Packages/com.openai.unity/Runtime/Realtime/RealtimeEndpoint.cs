@@ -29,7 +29,7 @@ namespace OpenAI.Realtime
         /// <returns><see cref="RealtimeSession"/>.</returns>
         public async Task<RealtimeSession> CreateSessionAsync(SessionConfiguration configuration = null, CancellationToken cancellationToken = default)
         {
-            string model = string.IsNullOrWhiteSpace(configuration?.Model) ? Model.GPT4oRealtime : configuration!.Model;
+            string model = string.IsNullOrWhiteSpace(configuration?.Model) ? Model.GPT_Realtime : configuration!.Model;
             var queryParameters = new Dictionary<string, string>();
 
             if (client.Settings.Info.IsAzureOpenAI)
@@ -42,7 +42,7 @@ namespace OpenAI.Realtime
             }
 
             var payload = JsonConvert.SerializeObject(configuration, OpenAIClient.JsonSerializationOptions);
-            var createSessionResponse = await Rest.PostAsync(GetUrl("/sessions"), payload, new RestParameters(client.DefaultRequestHeaders), cancellationToken);
+            var createSessionResponse = await Rest.PostAsync(GetUrl("/client_secrets"), payload, new RestParameters(client.DefaultRequestHeaders), cancellationToken);
             createSessionResponse.Validate(EnableDebug);
             var createSession = createSessionResponse.Deserialize<SessionConfiguration>(client);
 

@@ -203,7 +203,7 @@ namespace OpenAI.Models
         /// - Context Window: 128,000 tokens<br/>
         /// - Max Output Tokens: 4,096 tokens
         /// </remarks>
-        public static Model GPT4oRealtime { get; } = new("gpt-4o-realtime-preview", "openai");
+        public static Model GPT4oRealtime { get; } = new("gpt-realtime-2", "openai");
 
         /// <summary>
         /// This is a preview release of the GPT-4o-mini Realtime model, capable of responding to audio and text inputs in realtime over WebRTC or a WebSocket interface.
@@ -212,7 +212,7 @@ namespace OpenAI.Models
         /// - Context Window: 128,000 tokens<br/>
         /// - Max Output Tokens: 4,096 tokens
         /// </remarks>
-        public static Model GPT4oRealtimeMini { get; } = new("gpt-4o-mini-realtime-preview", "openai");
+        public static Model GPT4oRealtimeMini { get; } = new("gpt-realtime-mini", "openai");
 
         #endregion Realtime Models
 
