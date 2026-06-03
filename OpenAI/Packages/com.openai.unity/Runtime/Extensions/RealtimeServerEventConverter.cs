@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenAI.Realtime;
 using System;
+using UnityEngine;
 
 namespace OpenAI
 {
@@ -24,7 +25,8 @@ namespace OpenAI
                 "error" => jObject.ToObject<RealtimeEventError>(serializer),
                 _ when type.StartsWith("session") => jObject.ToObject<SessionResponse>(serializer),
                 "conversation.created" => jObject.ToObject<RealtimeConversationResponse>(serializer),
-                "conversation.item.created" => jObject.ToObject<ConversationItemCreatedResponse>(serializer),
+                "conversation.item.created" or "conversation.item.added" => jObject.ToObject<ConversationItemCreatedResponse>(serializer),
+                "conversation.item.done" => jObject.ToObject<ConversationItemCreatedResponse>(serializer),
                 _ when type.StartsWith("conversation.item.input_audio_transcription") => jObject.ToObject<ConversationItemInputAudioTranscriptionResponse>(serializer),
                 "conversation.item.truncated" => jObject.ToObject<ConversationItemTruncatedResponse>(serializer),
                 "conversation.item.deleted" => jObject.ToObject<ConversationItemDeletedResponse>(serializer),
@@ -32,7 +34,9 @@ namespace OpenAI
                 "input_audio_buffer.cleared" => jObject.ToObject<InputAudioBufferClearedResponse>(serializer),
                 "input_audio_buffer.speech_started" => jObject.ToObject<InputAudioBufferStartedResponse>(serializer),
                 "input_audio_buffer.speech_stopped" => jObject.ToObject<InputAudioBufferStoppedResponse>(serializer),
+                _ when type.StartsWith("response.output_audio_transcript") => jObject.ToObject<ResponseAudioTranscriptResponse>(serializer),
                 _ when type.StartsWith("response.audio_transcript") => jObject.ToObject<ResponseAudioTranscriptResponse>(serializer),
+                _ when type.StartsWith("response.output_audio") => jObject.ToObject<ResponseAudioResponse>(),
                 _ when type.StartsWith("response.audio") => jObject.ToObject<ResponseAudioResponse>(),
                 _ when type.StartsWith("response.content_part") => jObject.ToObject<ResponseContentPartResponse>(serializer),
                 _ when type.StartsWith("response.function_call_arguments") => jObject.ToObject<ResponseFunctionCallArgumentsResponse>(serializer),
@@ -40,8 +44,14 @@ namespace OpenAI
                 _ when type.StartsWith("response.text") => jObject.ToObject<ResponseTextResponse>(serializer),
                 _ when type.StartsWith("response") => jObject.ToObject<RealtimeResponse>(serializer),
                 _ when type.StartsWith("rate_limits") => jObject.ToObject<RateLimitsResponse>(serializer),
-                _ => throw new NotImplementedException($"Unknown event type: {type}")
+                _ => HandleUnknownEvent(type)
             };
+        }
+
+        private static IServerEvent HandleUnknownEvent(string type)
+        {
+            Debug.LogWarning($"[RealtimeServerEventConverter] Unhandled event type: {type}");
+            return null;
         }
     }
 }
