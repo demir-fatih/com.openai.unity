@@ -136,15 +136,13 @@ namespace OpenAI.Realtime
             {
 #if !PLATFORM_WEBGL
                 { "User-Agent", "OpenAI-DotNet" },
-                { "OpenAI-Beta", "realtime=v1" },
                 { "Authorization", $"Bearer {createSession.ClientSecret!.EphemeralApiKey}" }
 #endif
             }, new List<string>
             {
-#if PLATFORM_WEBGL // Web browsers do not support headers. https://github.com/openai/openai-realtime-api-beta/blob/339e9553a757ef1cf8c767272fc750c1e62effbb/lib/api.js#L76-L80
+#if PLATFORM_WEBGL
                 "realtime",
-                $"openai-insecure-api-key.{createSession.ClientSecret!.EphemeralApiKey}",
-                "openai-beta.realtime-v1"
+                $"openai-insecure-api-key.{createSession.ClientSecret!.EphemeralApiKey}"
 #endif
             });
             var session = new RealtimeSession(websocket, EnableDebug);
