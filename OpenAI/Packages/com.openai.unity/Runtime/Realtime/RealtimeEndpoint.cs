@@ -44,44 +44,38 @@ namespace OpenAI.Realtime
 
             // Build GA API request body by converting beta format to GA format
             var configJson = JObject.Parse(JsonConvert.SerializeObject(configuration, OpenAIClient.JsonSerializationOptions));
-            var expiresAfter = configJson.Remove("client_secret") != null
-                ? configuration.ClientSecret?.ExpiresAfter ?? new ExpiresAfter(600)
-                : new ExpiresAfter(600);
+            var expiresAfter = configuration.ClientSecret?.ExpiresAfter ?? new ExpiresAfter(600);
+            configJson.Remove("client_secret");
+
+            // Helper to extract and remove a field from configJson
+            JToken TakeField(string name) { var t = configJson[name]; configJson.Remove(name); return t; }
 
             // Map beta fields to GA "audio" structure
             var audioInput = new JObject();
             var audioOutput = new JObject();
 
-            // input_audio_format -> audio.input.format
-            var inputFormat = configJson.Remove("input_audio_format");
+            var inputFormat = TakeField("input_audio_format");
             if (inputFormat != null) audioInput["format"] = inputFormat;
 
-            // output_audio_format -> audio.output.format
-            var outputFormat = configJson.Remove("output_audio_format");
+            var outputFormat = TakeField("output_audio_format");
             if (outputFormat != null) audioOutput["format"] = outputFormat;
 
-            // voice -> audio.output.voice
-            var voice = configJson.Remove("voice");
+            var voice = TakeField("voice");
             if (voice != null) audioOutput["voice"] = voice;
 
-            // speed -> audio.output.speed
-            var speed = configJson.Remove("speed");
+            var speed = TakeField("speed");
             if (speed != null) audioOutput["speed"] = speed;
 
-            // turn_detection -> audio.input.turn_detection
-            var turnDetection = configJson.Remove("turn_detection");
+            var turnDetection = TakeField("turn_detection");
             if (turnDetection != null && turnDetection.Type != JTokenType.Null) audioInput["turn_detection"] = turnDetection;
 
-            // input_audio_noise_reduction -> audio.input.noise_reduction
-            var noiseReduction = configJson.Remove("input_audio_noise_reduction");
+            var noiseReduction = TakeField("input_audio_noise_reduction");
             if (noiseReduction != null) audioInput["noise_reduction"] = noiseReduction;
 
-            // input_audio_transcription -> audio.input.transcription
-            var transcription = configJson.Remove("input_audio_transcription");
+            var transcription = TakeField("input_audio_transcription");
             if (transcription != null) audioInput["transcription"] = transcription;
 
-            // modalities -> output_modalities
-            var modalities = configJson.Remove("modalities");
+            var modalities = TakeField("modalities");
             if (modalities != null) configJson["output_modalities"] = modalities;
 
             // Build audio object
