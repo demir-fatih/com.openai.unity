@@ -6,6 +6,7 @@ using OpenAI.Extensions;
 using OpenAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
@@ -115,8 +116,9 @@ namespace OpenAI.Realtime
             var createSessionResponse = await Rest.PostAsync(GetUrl("/client_secrets"), payload, new RestParameters(client.DefaultRequestHeaders), cancellationToken);
             createSessionResponse.Validate(EnableDebug);
 
-            // Response: { "client_secret": { "value": "...", "expires_at": ... }, "session": {...} }
+            // Parse response and log for debugging
             var responseJson = JObject.Parse(createSessionResponse.Body);
+            Debug.Log($"[RealtimeEndpoint] client_secrets response keys: {string.Join(", ", responseJson.Properties().Select(p => p.Name))}");
             var clientSecretToken = responseJson["client_secret"];
 
             if (clientSecretToken == null)
