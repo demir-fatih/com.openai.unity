@@ -55,10 +55,10 @@ namespace OpenAI.Realtime
             var audioOutput = new JObject();
 
             var inputFormat = TakeField("input_audio_format");
-            if (inputFormat != null) audioInput["format"] = inputFormat;
+            if (inputFormat != null) audioInput["format"] = new JObject { ["type"] = inputFormat };
 
             var outputFormat = TakeField("output_audio_format");
-            if (outputFormat != null) audioOutput["format"] = outputFormat;
+            if (outputFormat != null) audioOutput["format"] = new JObject { ["type"] = outputFormat };
 
             var voice = TakeField("voice");
             if (voice != null) audioOutput["voice"] = voice;
