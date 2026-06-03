@@ -54,20 +54,20 @@ namespace OpenAI.Realtime
             var audioInput = new JObject();
             var audioOutput = new JObject();
 
-            // Map beta format names to GA MIME types: pcm16->audio/pcm, g711_ulaw->audio/pcmu, g711_alaw->audio/pcma
-            string MapAudioFormat(string fmt) => fmt switch
+            // Map beta format names to GA format objects
+            JObject MapAudioFormat(string fmt) => fmt switch
             {
-                "pcm16" => "audio/pcm",
-                "g711_ulaw" => "audio/pcmu",
-                "g711_alaw" => "audio/pcma",
-                _ => fmt
+                "pcm16" => new JObject { ["type"] = "audio/pcm", ["rate"] = 24000 },
+                "g711_ulaw" => new JObject { ["type"] = "audio/pcmu" },
+                "g711_alaw" => new JObject { ["type"] = "audio/pcma" },
+                _ => new JObject { ["type"] = fmt }
             };
 
             var inputFormat = TakeField("input_audio_format");
-            if (inputFormat != null) audioInput["format"] = new JObject { ["type"] = MapAudioFormat(inputFormat.ToString()) };
+            if (inputFormat != null) audioInput["format"] = MapAudioFormat(inputFormat.ToString());
 
             var outputFormat = TakeField("output_audio_format");
-            if (outputFormat != null) audioOutput["format"] = new JObject { ["type"] = MapAudioFormat(outputFormat.ToString()) };
+            if (outputFormat != null) audioOutput["format"] = MapAudioFormat(outputFormat.ToString());
 
             var voice = TakeField("voice");
             if (voice != null) audioOutput["voice"] = voice;
