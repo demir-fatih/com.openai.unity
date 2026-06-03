@@ -91,7 +91,7 @@ namespace OpenAI.Realtime
             Model model = null,
             Prompt prompt = null,
             string instructions = null,
-            Modality modalities = Modality.Text | Modality.Audio,
+            Modality modalities = Modality.Audio,
             Voice voice = null,
             float? speed = null,
             RealtimeAudioFormat inputAudioFormat = RealtimeAudioFormat.PCM16,

@@ -76,7 +76,7 @@ namespace OpenAI.Realtime
         /// Note that this can include references to items from the default conversation.
         /// </param>
         public RealtimeResponseCreateParams(
-            Modality modalities = Modality.Text | Modality.Audio,
+            Modality modalities = Modality.Audio,
             string instructions = null,
             string voice = null,
             RealtimeAudioFormat outputAudioFormat = RealtimeAudioFormat.PCM16,

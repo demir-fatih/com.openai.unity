@@ -78,7 +78,7 @@ namespace OpenAI.Realtime
         [Preserve]
         public Options(
             Model model,
-            Modality modalities = Modality.Text | Modality.Audio,
+            Modality modalities = Modality.Audio,
             Voice voice = null,
             string instructions = null,
             RealtimeAudioFormat inputAudioFormat = RealtimeAudioFormat.PCM16,
