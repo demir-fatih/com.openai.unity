@@ -48,6 +48,8 @@ namespace OpenAI.Realtime
                 ? configuration.ClientSecret?.ExpiresAfter ?? new ExpiresAfter(600)
                 : new ExpiresAfter(600);
 
+            configJson["type"] = "realtime";
+
             var requestBody = new JObject
             {
                 ["expires_after"] = JObject.FromObject(expiresAfter, JsonSerializer.Create(OpenAIClient.JsonSerializationOptions)),
